@@ -1,0 +1,15 @@
+harbor_installer_url: "https://github.com/goharbor/harbor/releases/download/v2.11.0/harbor-offline-installer-v2.11.0.tgz"
+harbor_home: "/opt/harbor"
+harbor_hostname: "harbor.th1enlm02.live"
+harbor_ip: ""
+harbor_http_port: 80
+harbor_admin_password: "admin@group03"
+database_password: "admin@group03"
+
+docker_insecure_registry: /etc/docker
+
+tls_enabled: true
+certbot_certificate_path: "/etc/letsencrypt/live/{{ harbor_hostname }}/fullchain.pem"
+certbot_private_key_path: "/etc/letsencrypt/live/{{ harbor_hostname }}/privkey.pem"
+
+email: "minhthienluu2406@gmail.com"

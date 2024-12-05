@@ -1,0 +1,16 @@
+---
+- name: Add key for normal user
+  ansible.builtin.include_tasks:
+    file: add_key_normal_user.yml
+  with_items: "{{ users }}" 
+  loop_control:
+    label: "{{ item }}"
+  when: ssh_key[item] is defined and not ansible_user == 'root'
+
+- name: Add key for root user
+  ansible.builtin.include_tasks:
+    file: add_key_root_user.yml
+  with_items: "{{ users }}" 
+  loop_control:
+    label: "{{ item }}"
+  when: ssh_key[item] is defined and ansible_user == 'root'

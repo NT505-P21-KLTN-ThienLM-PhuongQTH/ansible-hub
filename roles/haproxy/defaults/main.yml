@@ -1,0 +1,11 @@
+---
+domain_name: th1enlm02.live
+harbor_domain: harbor.{{ domain_name }}
+harbor_listen_port: 443
+minio_domain: minio.{{ domain_name }}
+minio_listen_port: 9091
+vault_domain: vault.{{ domain_name }}
+vault_listen_port: 8200
+sonarqube_domain: sonarqube.{{ domain_name }}
+sonarqube_listen_port: 9000
+application_url: https://application.{{ domain_name }}

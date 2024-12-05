@@ -1,0 +1,6 @@
+_prometheus_binary_install_dir: '/usr/local/bin'
+_prometheus_repo: "prometheus/prometheus"
+_github_api_headers: "{{ {'GITHUB_TOKEN': lookup('ansible.builtin.env', 'GITHUB_TOKEN')} if (lookup('ansible.builtin.env', 'GITHUB_TOKEN')) else {} }}"
+
+prometheus_basic_auth_user: 'admin'
+prometheus_basic_auth_password: 'admin@group03'

@@ -1,0 +1,6 @@
+- name: Ping all hosts
+  hosts: minio
+  gather_facts: no
+  tasks:
+    - name: Ping all hosts
+      ping:

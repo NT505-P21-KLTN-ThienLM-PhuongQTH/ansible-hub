@@ -1,0 +1,63 @@
+---
+# defaults file for loki
+loki_version: "latest"
+loki_uninstall: false
+loki_http_listen_port: 3100
+loki_http_listen_address: "0.0.0.0"
+loki_s3_storage: ""
+loki_log_level: "info"
+loki_expose_port: false
+loki_download_url: "https://github.com/grafana/loki/releases/download/v{{ loki_version }}/loki_{{ loki_version }}_amd64.deb"
+loki_working_path: "/var/lib/loki"
+
+# Default Variables for /etc/loki/config.yml
+loki_auth_enabled: false
+loki_target: "all"
+
+loki_pattern_ingester:
+  enabled: true
+  lifecycler:
+    ring:
+      kvstore:
+        store: inmemory
+
+loki_server:
+  log_level: "{{ loki_log_level }}"
+  http_listen_address: "{{ loki_http_listen_address }}"
+  http_listen_port: "{{ loki_http_listen_port }}"
+  grpc_listen_port: 9096
+  
+loki_common:
+  instance_addr: 127.0.0.1
+  path_prefix: "{{ loki_working_path }}"
+  replication_factor: 1
+  ring:
+    kvstore:
+      store: inmemory
+
+loki_query_range:
+  results_cache:
+    cache:
+      embedded_cache:
+        enabled: true
+        max_size_mb: 100
+
+loki_limits_config:
+  max_global_streams_per_user: 10000
+
+loki_schema_config:
+  configs:
+    - from: 2020-10-24
+      store: tsdb
+      object_store: filesystem
+      schema: v13
+      index:
+        prefix: index_
+        period: 24h
+
+loki_storage_config:
+  boltdb_shipper:
+    active_index_directory: /tmp/loki/boltdb-shipper-active
+    cache_location: /tmp/loki/boltdb-shipper-cache
+  filesystem:
+    directory: /tmp/loki/chunks

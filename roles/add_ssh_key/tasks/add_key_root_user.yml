@@ -1,0 +1,7 @@
+- name: Check already exists key for {{ ansible_host }}
+  ansible.builtin.shell: "cat /root/.ssh/authorized_keys"
+  register: existing_keys
+
+- name: Adding key user {{ item }} in {{ ansible_host }}
+  ansible.builtin.shell: "echo '{{ ssh_key[item] }}' >> /root/.ssh/authorized_keys"
+  when: not ssh_key[item] in existing_keys.stdout

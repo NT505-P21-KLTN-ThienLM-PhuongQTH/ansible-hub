@@ -1,0 +1,31 @@
+# - name: Ensure ~/.ssh/config exists
+#   ansible.builtin.file:
+#     path: ~/.ssh/config
+#     state: present
+#   delegate_to: localhost
+
+- name: Ensure Include config.d/* already in ~/.ssh/config
+  ansible.builtin.lineinfile:
+    path: ~/.ssh/config
+    create: true
+    line: "Include config.d/*"
+  delegate_to: localhost
+
+- name: Ensure ~/.ssh/config.d exists
+  ansible.builtin.file:
+    path: ~/.ssh/config.d
+    state: directory
+  delegate_to: localhost
+
+- name: Ensure config exists
+  ansible.builtin.blockinfile:
+    path: ~/.ssh/config.d/ansible_generated
+    # create: true
+    # marker: "# {mark} ANSIBLE MANAGED BLOCK"
+    state: present
+    marker: "# {mark} ANSIBLE MANAGED BLOCK {{ project }}-{{ inventory_hostname }}"
+    block: |
+      Host {{ project }}-{{ inventory_hostname }}
+        HostName {{ ansible_host }}
+        User {{ ansible_user }}
+  delegate_to: localhost

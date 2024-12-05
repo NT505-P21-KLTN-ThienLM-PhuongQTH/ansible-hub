@@ -1,0 +1,62 @@
+---
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: yes
+
+- name: "Remove conflicting grafana packages"
+  ansible.builtin.package:
+    name: grafana-data
+    state: absent
+
+- name: "Install dependencies"
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - gnupg2
+    - adduser
+    - software-properties-common
+    - apt-transport-https
+    - wget
+    - ca-certificates
+    - libfontconfig
+
+- name: "Prepare apt"
+  block:
+    - name: Create keyrings directory if it doesn't exist
+      ansible.builtin.file:
+        path: "{{ grafana_keyrings_dir }}"
+        state: directory
+        mode: '0755'
+
+    - name: Import Grafana GPG key
+      ansible.builtin.shell: |
+        wget -q -O - https://apt.grafana.com/gpg.key | gpg --dearmor | sudo tee /etc/apt/keyrings/grafana.gpg > /dev/null
+
+    - name: Add Grafana apt repository
+      ansible.builtin.shell: |
+        echo "deb [signed-by=/etc/apt/keyrings/grafana.gpg] https://apt.grafana.com stable main" | sudo tee -a /etc/apt/sources.list.d/grafana.list
+
+- name: "Update apt cache"
+  ansible.builtin.apt:
+    update_cache: yes
+
+- name: "Install Grafana"
+  ansible.builtin.package:
+    name: grafana
+    state: "{{ (grafana_version == 'latest') | ternary('latest', 'present') }}"
+
+- name: "Restart grafana"
+  ansible.builtin.service:
+    name: grafana-server
+    state: restarted
+    enabled: yes
+
+- name: Wait for Grafana to start
+  ansible.builtin.uri:
+    url: "http://{{ grafana_address }}:{{ grafana_port }}"
+    status_code: 200
+  register: __result
+  until: __result.status == 200
+  retries: 120
+  delay: 1

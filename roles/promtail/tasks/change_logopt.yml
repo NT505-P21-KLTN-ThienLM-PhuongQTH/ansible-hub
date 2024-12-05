@@ -1,0 +1,45 @@
+- name: Ensure the JSON file exists with default content
+  copy:
+    content: "{}"
+    dest: /etc/docker/daemon.json
+    force: no
+
+- name: load docker config from file
+  slurp:
+    src: /etc/docker/daemon.json
+  register: config_file
+
+- name: add log config
+  set_fact:
+    config_file: >-
+      {{
+        config_file.content | b64decode | from_json | default({}) | combine({
+          "log-driver": "json-file",
+          "log-opts": {
+            "tag": "{{.ImageName}}|{{.Name}}|{{.ImageFullID}}|{{.FullID}}"
+          }
+        })
+      }}
+
+- name: save config to file
+  copy: 
+    content: "{{ config_file | to_nice_json }}" 
+    dest: /etc/docker/daemon.json
+
+- name: Restart Docker service
+  ansible.builtin.systemd:
+    name: docker
+    state: restarted
+
+# - name: Check if there are any Docker containers
+#   ansible.builtin.command: docker ps -aq
+#   register: docker_containers
+#   changed_when: false
+
+# - name: Restart all Docker containers
+#   ansible.builtin.shell: |
+#     docker restart $(docker ps -aq)
+#   when: docker_containers.stdout != ""
+#   changed_when: docker_containers.stdout != ""
+#   args:
+#     warn: false

@@ -1,0 +1,26 @@
+- name: Get Docker service
+  ansible.builtin.systemd:
+    name: "docker"
+  register: __docker_status
+
+- name: Get Docker status
+  set_fact:
+    __docker_installed: "{{ __docker_status.status.ActiveState == 'active' }}"
+
+- name: Get HAProxy service
+  ansible.builtin.systemd:
+    name: "haproxy"
+  register: __haproxy_status
+
+- name: Get HAProxy status
+  set_fact:
+    __haproxy_installed: "{{ __haproxy_status.status.ActiveState == 'active' }}"
+
+# - name: Print variable to console
+#   debug:
+#     msg:
+#       - "Docker installed: {{ __docker_installed }}"
+#       - "Mongo installed: {{ __mongo_installed }}"
+#       - "Postgres installed: {{ __postgres_installed }}"
+#       - "HAProxy installed: {{ __haproxy_installed }}"
+#       - "PGPool installed: {{ __pgpool_installed }}"

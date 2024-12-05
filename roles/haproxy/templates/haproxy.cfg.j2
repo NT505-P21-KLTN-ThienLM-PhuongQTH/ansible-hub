@@ -1,0 +1,77 @@
+
+global
+        log /dev/log    local0
+        log /dev/log    local1 notice
+        chroot /var/lib/haproxy
+        stats socket /run/haproxy/admin.sock mode 660 level admin expose-fd listeners
+        stats timeout 30s
+        user haproxy
+        group haproxy
+        daemon
+
+        # Default SSL material locations
+        ca-base /etc/ssl/certs
+        crt-base /etc/ssl/private
+
+        # See: https://ssl-config.mozilla.org/#server=haproxy&server-version=2.0.3&config=intermediate
+        ssl-default-bind-ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384
+        ssl-default-bind-ciphersuites TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256
+        ssl-default-bind-options ssl-min-ver TLSv1.2 no-tls-tickets
+
+defaults
+        log     global
+        mode    http
+        option  httplog
+        option  dontlognull
+        timeout connect 5000
+        timeout client  50000
+        timeout server  50000
+        errorfile 400 /etc/haproxy/errors/500.http
+        errorfile 403 /etc/haproxy/errors/403.http
+        errorfile 408 /etc/haproxy/errors/408.http
+        errorfile 500 /etc/haproxy/errors/500.http
+        errorfile 502 /etc/haproxy/errors/502.http
+        errorfile 503 /etc/haproxy/errors/500.http
+        errorfile 504 /etc/haproxy/errors/504.http
+	errorfile 404 /etc/haproxy/errors/500.http
+
+frontend https-in
+        bind :80
+        #bind :443 ssl crt /etc/haproxy/certs
+
+        mode http
+        acl is_cors_preflight method OPTIONS
+        http-response set-header Access-Control-Allow-Origin {{ application_url }}
+        http-response set-header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+        http-response set-header Access-Control-Allow-Headers "Content-Type, Authorization, X-Theme, Client-Id, Client-Secret, fineract-platform-tenantid"
+        http-response set-header Access-Control-Max-Age "3600" if is_cors_preflight
+	
+	acl ACL_harbor hdr(host) -i {{ harbor_domain }} www.{{ harbor_domain }}
+        use_backend backend_harbor if ACL_harbor
+	
+	acl ACL_minio hdr(host) -i {{ minio_domain }} www.{{ minio_domain }}
+        use_backend backend_minio if ACL_minio
+
+        acl ACL_vault hdr(host) -i {{ vault_domain }} www.{{ vault_domain }}
+        use_backend backend_vault if ACL_vault
+
+        acl ACL_sonarqube hdr(host) -i {{ sonarqube_domain }} www.{{ sonarqube_domain }}
+        use_backend backend_sonarqube if ACL_sonarqube
+
+        default_backend eks_cluster
+	redirect scheme https code 301 if !{ ssl_fc }
+
+backend eks_cluster
+        server master_node_http {{ eks_master_ip }}:{{ eks_listen_port }} check
+
+backend backend_harbor
+	server harbor {{ hostvars[harbor]['ansible_host'] }}:{{ harbor_listen_port }} check
+
+backend backend_minio
+        server minio {{ hostvars[minio]['ansible_host'] }}:{{ minio_listen_port }} check
+
+backend backend_vault
+        server vault {{ hostvars[vault]['ansible_host'] }}:{{ vault_listen_port }} check
+
+backend backend_sonarqube
+        server sonarqube {{ hostvars[sonarqube]['ansible_host'] }}:{{ sonarqube_listen_port }} check

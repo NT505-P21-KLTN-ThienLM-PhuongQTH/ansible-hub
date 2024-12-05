@@ -1,0 +1,13 @@
+---
+- name: Setup insecure registry
+  template:
+    src: daemon.json.j2
+    dest: "{{ docker_insecure_registry }}/daemon.json"
+    owner: root
+    group: root
+    mode: '0775'
+
+- name: Restart Docker Engine
+  systemd:
+    name: docker
+    state: restarted

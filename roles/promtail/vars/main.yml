@@ -1,0 +1,64 @@
+promtail_runtime_mode: "root"
+
+promtail_scrape_docker:
+  - job_name: docker
+    pipeline_stages:
+      - json:
+          expressions:
+            output: log
+            stream: stream
+            timestamp: time
+            attrs: attrs
+            tag: attrs.tag
+      - regex:
+          expression: (?P<image_name>(?:[^|]*[^|])).(?P<container_name>(?:[^|]*[^|])).(?P<image_id>(?:[^|]*[^|])).(?P<container_id>(?:[^|]*[^|]))
+          source: "tag"
+      - labels:
+          tag:
+          stream:
+          image_name:
+          container_name:
+          image_id:
+          container_id:   
+      - timestamp:
+          source: timestamp
+          format: RFC3339Nano
+      - output:
+          source: output 
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          project: "{{ project }}"
+          subnet: "{{ subnet }}"
+          hostname: "{{ inventory_hostname }}"
+          service_name: docker
+          __path__: /var/lib/docker/containers/*/*-json.log
+
+promtail_scrape_haproxy:
+  - job_name: haproxy
+    pipeline_stages:
+      - regex:
+          expression: '^(?P<timestamp>\w+ \d+ \d+:\d+:\d+) (?P<host>[^ ]+) (?P<process>[^[]+)\[(?P<pid>\d+)\]: (?P<client_ip>[^ ]+):(?P<client_port>\d+) \[(?P<request_date>[^\]]+)\] (?P<frontend>[^ ]+)~ (?P<backend>[^ ]+)/(?P<server>[^ ]+) (?P<time_tq>\d+)/(?P<time_tw>\d+)/(?P<time_tc>\d+)/(?P<time_tr>\d+)/(?P<time_tt>\d+) (?P<http_status>\d+) (?P<bytes>\d+) (?P<captured_request_cookie>[^ ]+) (?P<captured_response_cookie>[^ ]+) (?P<termination_state>[^ ]+) (?P<actconn>\d+)/(?P<feconn>\d+)/(?P<beconn>\d+)/(?P<srv_conn>\d+)/(?P<retries>\d+) (?P<srv_queue>\d+)/(?P<backend_queue>\d+) "(?P<method>[^ ]+) (?P<uri>[^ ]+) (?P<protocol>[^"]+)"'
+      - timestamp:
+          source: timestamp
+          format: "Jan 02 15:04:05"
+      - labels:
+          client_ip:
+          frontend:
+          backend:
+          server:
+          http_status:
+          method:
+          uri:
+      - output:
+          source: message
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          project: "{{ project }}"
+          subnet: "{{ subnet }}"
+          hostname: "{{ inventory_hostname }}"
+          service_name: haproxy
+          __path__: /var/log/haproxy.log

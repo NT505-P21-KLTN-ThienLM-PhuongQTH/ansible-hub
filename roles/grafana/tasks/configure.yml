@@ -1,0 +1,12 @@
+---
+- name: Set default admin password
+  ansible.builtin.shell: |
+    grafana-cli admin reset-admin-password {{ grafana_security.admin_password }}
+  register: __command_admin
+  changed_when: __command_admin.rc != 0
+
+- name: "Restart grafana"
+  ansible.builtin.service:
+    name: grafana-server
+    state: restarted
+    

@@ -1,0 +1,42 @@
+---
+- name: Ensure HAProxy is installed
+  ansible.builtin.package:
+    name: haproxy
+    state: present
+
+- name: Make cert directory
+  ansible.builtin.file:
+    path: /etc/haproxy/certs
+    state: directory
+    mode: '0755'
+
+- name: Copy configuration file
+  ansible.builtin.template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy_temp.cfg
+    mode: '0644'
+
+- name: Debug HAProxy
+  ansible.builtin.shell: haproxy -c -f /etc/haproxy/haproxy.cfg
+  register: haproxy_debug
+
+- name: Debug HAProxy output
+  ansible.builtin.debug:
+    var: haproxy_debug.stdout_lines
+
+- name: Restart HAProxy
+  ansible.builtin.systemd:
+    name: haproxy
+    state: restarted
+
+- name: Enable HAProxy
+  ansible.builtin.systemd:
+    name: haproxy
+    enabled: yes
+    state: started
+    daemon_reload: yes
+    masked: no
+
+# certbot certonly --standalone --agree-tos --non-interactive -m minhthienluu2406@gmail.com -d application.th1enlm02.live -d auth-api.th1enlm02.live -d student-api.th1enlm02.live -d lecturer-api.th1enlm02.live -d class-api.th1enlm02.live -d prometheus.th1enlm02.live -d loki.th1enlm02.live -d grafana.th1enlm02.live -d icinga.th1enlm02.live --preferred-challenges http --http-01-port 80 --cert-name th1enlm02.live
+# cat /etc/letsencrypt/live/th1enlm02.live/fullchain.pem /etc/letsencrypt/live/th1enlm02.live/privkey.pem > /etc/haproxy/certs/th1enlm02.live.pem
+#  sudo certbot certonly --standalone --agree-tos --non-interactive -m minhthienluu2406@gmail.com -d prometheus-cluster.th1enlm02.live -d loki-cluster.th1enlm02.live --preferred-challenges http --http-01-port 80 --cert-name cluster-monitor

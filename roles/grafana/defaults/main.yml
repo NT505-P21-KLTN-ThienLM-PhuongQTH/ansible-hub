@@ -1,0 +1,14 @@
+---
+grafana_version: latest
+
+grafana_keyrings_dir: /etc/apt/keyrings
+
+grafana_apt_release_channel: stable
+grafana_apt_key: https://apt.grafana.com/gpg.key
+
+grafana_address: "0.0.0.0"
+grafana_port: 3000
+
+grafana_security:
+  admin_user: admin
+  admin_password: "admin@group03"

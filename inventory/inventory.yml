@@ -1,0 +1,29 @@
+all:
+    children:
+        bastion:
+        private_hosts:
+    vars:
+        ansible_user: ubuntu
+        ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+        ansible_python_interpreter: /usr/bin/python3
+        project: group03
+
+bastion:
+    hosts:
+        bastion_host:
+            ansible_host: 10.0.100.10
+    vars:
+        subnet: public-subnet
+
+private_hosts:
+    hosts:
+        harbor:
+            ansible_host: 10.0.30.10
+        minio:
+            ansible_host: 34.228.54.78
+        vault:
+            ansible_host: 10.0.30.12
+        security_servers:
+            ansible_host: 10.0.30.13
+    vars:
+        subnet: private-subnet

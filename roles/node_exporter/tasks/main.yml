@@ -1,0 +1,43 @@
+---
+- name: check if node_exporter is installed
+  ansible.builtin.stat:
+    path: "{{ node_exporter_binary_install_dir }}/node_exporter"
+  register: __node_exporter_is_installed
+  check_mode: false
+  tags:
+    - node_exporter_install
+
+- name: install node_exporter
+  ansible.builtin.include_tasks:
+    file: install.yml
+    apply: 
+      become: true
+      tags:
+        - node_exporter_install
+  when: 
+    ( not __node_exporter_is_installed.stat.exists ) or
+    ( node_exporter_binary_local_dir | length > 0 )
+  tags:
+    - node_exporter_install
+
+- name: configure node_exporter
+  ansible.builtin.include_tasks:
+    file: configure.yml
+    apply:
+      become: true
+      tags:
+        - node_exporter_configure
+  tags:
+    - node_exporter_configure
+
+- name: Ensure Node Exporter is enabled on boot
+  become: true
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: node_exporter
+    enabled: true
+    state: started
+  when:
+    - not ansible_check_mode
+  tags:
+    - node_exporter_run

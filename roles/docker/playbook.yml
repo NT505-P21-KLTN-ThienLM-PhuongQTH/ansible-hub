@@ -1,0 +1,8 @@
+# - hosts: docker
+#   gather_facts: no
+#   become: yes
+#   roles:
+#     - docker
+
+# Câu lệnh để chạy
+# ansible-playbook -i inventory roles/docker/playbook.yml
