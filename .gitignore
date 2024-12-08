@@ -1,6 +1,4 @@
 *.vscode
-*.terraform
-
-# Terraform
-*.terraform.lock.hcl
-terraform.*
+*.pem
+*.key
+*.crt

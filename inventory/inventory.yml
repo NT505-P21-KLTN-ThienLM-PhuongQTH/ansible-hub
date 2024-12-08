@@ -17,13 +17,9 @@ bastion:
 
 private_hosts:
     hosts:
-        harbor:
+        storage_servers:
             ansible_host: 10.0.30.10
-        minio:
-            ansible_host: 34.228.54.78
-        vault:
-            ansible_host: 10.0.30.12
         security_servers:
-            ansible_host: 10.0.30.13
+            ansible_host: 10.0.30.11
     vars:
         subnet: private-subnet
