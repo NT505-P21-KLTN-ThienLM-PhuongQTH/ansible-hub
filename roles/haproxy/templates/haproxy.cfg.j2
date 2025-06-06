@@ -52,26 +52,19 @@ frontend https-in
 	acl ACL_minio hdr(host) -i {{ minio_domain }} www.{{ minio_domain }}
         use_backend backend_minio if ACL_minio
 
-        acl ACL_vault hdr(host) -i {{ vault_domain }} www.{{ vault_domain }}
-        use_backend backend_vault if ACL_vault
+    acl ACL_mlflow hdr(host) -i {{ mlflow_domain }} www.{{ mlflow_domain }}
+    use_backend backend_mlflow if ACL_mlflow
 
-        acl ACL_sonarqube hdr(host) -i {{ sonarqube_domain }} www.{{ sonarqube_domain }}
-        use_backend backend_sonarqube if ACL_sonarqube
-
-        default_backend eks_cluster
-	redirect scheme https code 301 if !{ ssl_fc }
-
-backend eks_cluster
-        server master_node_http {{ eks_master_ip }}:{{ eks_listen_port }} check
+	#redirect scheme https code 301 if !{ ssl_fc }
 
 backend backend_harbor
-	server harbor {{ hostvars[harbor]['ansible_host'] }}:{{ harbor_listen_port }} check
+	server harbor {{ hostvars['registry_servers']['ansible_host'] }}:{{ harbor_listen_port }} check
 
 backend backend_minio
-        server minio {{ hostvars[minio]['ansible_host'] }}:{{ minio_listen_port }} check
+        server minio {{ hostvars['registry_servers']['ansible_host'] }}:{{ minio_listen_port }} check
 
-backend backend_vault
-        server vault {{ hostvars[vault]['ansible_host'] }}:{{ vault_listen_port }} check
+backend backend_mlflow
+        server mlflow {{ hostvars['infer_servers']['ansible_host'] }}:{{ mlflow_listen_port }} check
 
-backend backend_sonarqube
-        server sonarqube {{ hostvars[sonarqube]['ansible_host'] }}:{{ sonarqube_listen_port }} check
+backend backend_inference
+        server inference {{ hostvars['infer_servers']['ansible_host'] }}:{{ inference_listen_port }} check
