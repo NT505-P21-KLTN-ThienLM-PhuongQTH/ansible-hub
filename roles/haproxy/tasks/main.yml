@@ -13,7 +13,7 @@
 - name: Copy configuration file
   ansible.builtin.template:
     src: haproxy.cfg.j2
-    dest: /etc/haproxy/haproxy_temp.cfg
+    dest: /etc/haproxy/haproxy.cfg
     mode: '0644'
 
 - name: Debug HAProxy

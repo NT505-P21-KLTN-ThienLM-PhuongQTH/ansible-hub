@@ -1,11 +1,11 @@
 ---
 domain_name: th1enlm02.live
 harbor_domain: harbor.{{ domain_name }}
-harbor_listen_port: 443
+harbor_listen_port: 80
 minio_domain: minio.{{ domain_name }}
-minio_listen_port: 9091
-vault_domain: vault.{{ domain_name }}
-vault_listen_port: 8200
-sonarqube_domain: sonarqube.{{ domain_name }}
-sonarqube_listen_port: 9000
+minio_listen_port: 9001
+mlflow_domain: mlflow.{{ domain_name }}
+mlflow_listen_port: 5000
+inference_domain: inference.{{ domain_name }}
+inference_listen_port: 8080
 application_url: https://application.{{ domain_name }}
