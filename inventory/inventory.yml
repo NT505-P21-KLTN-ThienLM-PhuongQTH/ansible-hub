@@ -8,8 +8,8 @@ all:
         ansible_python_interpreter: /usr/bin/python3
         bastion_host: "{{ hostvars['bastion_host'].ansible_host }}"
         bastion_user: ubuntu
-        key_path: ~/.ssh/id_rsa
-        project: group03
+        key_path: /home/minhthien-luu/.credentials/th1enlm02-key.pem
+        project: thesis
 
 bastion:
     hosts:
@@ -21,14 +21,14 @@ bastion:
 
 private_hosts:
     hosts:
+        database_servers:
+            ansible_host: 10.0.1.10
         storage_servers:
-            ansible_host: 10.0.5.10
-        registry_servers:
-            ansible_host: 10.0.5.11
-        infer_servers:
-            ansible_host: 10.0.5.12
+            ansible_host: 10.0.2.10
+        mlflow_server:
+            ansible_host: 10.0.3.10
     vars:
         subnet: private-subnet
         ansible_ssh_common_args: >-
-            -o ProxyCommand="ssh -i ~/.ssh/id_rsa -W %h:%p ubuntu@54.209.84.210"
-        ansible_ssh_private_key_file: ~/.ssh/kltn
+            -o ProxyCommand="ssh -i /home/minhthien-luu/.credentials/th1enlm02-key.pem -W %h:%p ubuntu@54.209.84.210"
+        ansible_ssh_private_key_file: /home/minhthien-luu/.credentials/th1enlm02-key.pem
