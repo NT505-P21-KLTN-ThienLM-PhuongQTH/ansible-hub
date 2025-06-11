@@ -38,7 +38,7 @@ minio_secret_key: ""
 
 # Minio root user access and secret keys
 minio_root_user: "admin"
-minio_root_password: "admin@group03"
+minio_root_password: "thienlm_phuongqth"
 
 # Switches to enable/disable the Minio server and/or Minio client installation.
 minio_install_server: true

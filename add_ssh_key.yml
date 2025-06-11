@@ -6,8 +6,6 @@
     - add_ssh_key
   vars:
     users:
-      - dang
       - thien
       - thien-windows
       - phuong
-      - nguyen

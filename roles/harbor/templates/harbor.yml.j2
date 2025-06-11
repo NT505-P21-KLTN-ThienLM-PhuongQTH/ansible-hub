@@ -2,7 +2,7 @@
 
 # The IP address or hostname to access admin UI and registry service.
 # DO NOT use localhost or 127.0.0.1, because Harbor needs to be accessed by external clients.
-hostname: {{ harbor_hostname }}
+hostname: {{ harbor_ip }}
 
 # http related config
 http:
@@ -51,7 +51,7 @@ https:
 
 # Uncomment external_url if you want to enable external proxy
 # And when it enabled the hostname will no longer used
-# external_url: https://reg.mydomain.com:8433
+external_url: https://{{ harbor_hostname }}
 
 # The initial password of Harbor admin
 # It only works in first time to install harbor

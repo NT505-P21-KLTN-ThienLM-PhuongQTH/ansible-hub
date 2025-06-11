@@ -7,24 +7,16 @@
     - haproxy
 
 - name: Install MiniO
-  hosts: registry_servers
+  hosts: storage_servers
   gather_facts: yes
   become: yes
   roles:
     - minio
 
-- name: Install Docker
-  hosts: registry_servers
+- name: Install Harbor
+  hosts: storage_servers
   gather_facts: yes
   become: yes
   roles:
     - docker
-
-- name: Install Harbor
-  hosts: registry_servers
-  gather_facts: yes
-  become: yes
-  roles:
     - harbor
-
-#- name: Install MLFlow

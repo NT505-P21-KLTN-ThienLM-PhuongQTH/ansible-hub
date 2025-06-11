@@ -15,6 +15,68 @@
     dest: "{{ harbor_home }}"
     remote_src: yes
 
+- name: Check if SSL is enabled
+  when: tls_enabled == true
+  block:
+    - name: Install Certbot
+      apt:
+        name: certbot
+        state: present
+
+    - name: Obtain SSL certificate
+      command: >
+        certbot certonly --standalone --preferred-challenges http --http-01-port 80
+          -d {{ harbor_hostname }}
+          --non-interactive --agree-tos --email "{{ email }}"
+          --cert-name {{ harbor_hostname }}
+      register: certbot_output
+
+    - name: Debug Certbot output
+      debug:
+        var: certbot_output.stdout
+
+    - name: Create Harbor certificates directory
+      file:
+        path: "{{ harbor_home }}/harbor/certs/{{ harbor_hostname }}"
+        state: directory
+
+    - name: Copy server certificate and key to Harbor certificates folder
+      copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        remote_src: yes
+        mode: '0644'
+      with_items:
+        - { src: "{{ certbot_certificate_path }}", dest: "{{ harbor_home }}/harbor/certs/{{ harbor_hostname }}" }
+        - { src: "{{ certbot_private_key_path }}", dest: "{{ harbor_home }}/harbor/certs/{{ harbor_hostname }}" }
+
+    - name: Ensure OpenSSL is installed
+      apt:
+        name: openssl
+        state: present
+
+    - name: Convert .crt to .cert for Docker
+      command: >
+        openssl x509 -inform PEM -in "{{ certbot_certificate_path }}" -out "{{ harbor_home }}/harbor/certs/{{ harbor_hostname }}/{{ harbor_hostname }}.cert"
+      args:
+        creates: "{{ harbor_home }}/harbor/certs/{{ harbor_hostname }}/{{ harbor_hostname }}.cert"
+
+    - name: Create Docker certificates directory
+      file:
+        path: "/etc/docker/certs.d/{{ harbor_hostname }}"
+        state: directory
+
+    - name: Copy certificates to Docker certificates folder
+      copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        remote_src: yes
+        mode: '0644'
+      with_items:
+        - { src: "{{ certbot_certificate_path }}", dest: "/etc/docker/certs.d/{{ harbor_hostname }}/ca.crt" }
+        - { src: "{{ certbot_private_key_path }}", dest: "/etc/docker/certs.d/{{ harbor_hostname }}/{{ harbor_hostname }}.key" }
+        - { src: "{{ harbor_home }}/harbor/certs/{{ harbor_hostname }}/{{ harbor_hostname }}.cert", dest: "/etc/docker/certs.d/{{ harbor_hostname }}/{{ harbor_hostname }}.cert" }
+
 - name: Configure Harbor
   template:
     src: harbor.yml.j2
@@ -37,4 +99,4 @@
   command: "{{ harbor_home }}/harbor/prepare"
 
 - name: Install Harbor
-  command: "{{ harbor_home }}/harbor/install.sh"
+  command: "{{ harbor_home }}/harbor/install.sh --with-trivy"
