@@ -14,8 +14,8 @@ all:
 bastion:
     hosts:
         bastion_host:
-            ansible_host: 54.209.84.210
-            ansible_ssh_private_key_file: "{{ key_path }}"
+            ansible_host: 10.0.100.10
+            # ansible_ssh_private_key_file: "{{ key_path }}"
     vars:
         subnet: public-subnet
 
@@ -29,6 +29,6 @@ private_hosts:
             ansible_host: 10.0.3.10
     vars:
         subnet: private-subnet
-        ansible_ssh_common_args: >-
-            -o ProxyCommand="ssh -i /home/minhthien-luu/.credentials/th1enlm02-key.pem -W %h:%p ubuntu@54.209.84.210"
+        # ansible_ssh_common_args: >-
+        #     -o ProxyCommand="ssh -i /home/minhthien-luu/.credentials/th1enlm02-key.pem -W %h:%p ubuntu@54.209.84.210"
         ansible_ssh_private_key_file: /home/minhthien-luu/.credentials/th1enlm02-key.pem

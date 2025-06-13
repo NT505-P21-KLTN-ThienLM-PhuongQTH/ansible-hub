@@ -1,10 +1,10 @@
 ---
-- name: Install HAProxy
-  hosts: bastion
-  gather_facts: yes
-  become: yes
-  roles:
-    - haproxy
+# - name: Install HAProxy
+#   hosts: bastion
+#   gather_facts: yes
+#   become: yes
+#   roles:
+#     - haproxy
 
 - name: Install MiniO
   hosts: storage_servers
