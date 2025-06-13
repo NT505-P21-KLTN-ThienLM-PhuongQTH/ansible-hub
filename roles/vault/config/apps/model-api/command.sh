@@ -1,0 +1,1 @@
+vault kv put thesis/production/model-api @data.json

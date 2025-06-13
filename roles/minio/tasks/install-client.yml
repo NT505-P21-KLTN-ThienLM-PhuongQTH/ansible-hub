@@ -30,10 +30,11 @@
   retries: 5
   delay: 2
 
-- name: Create 'mlflow' bucket using mc
+- name: Create 'mlflow' and 'loki' buckets using mc
   tags: create_mlflow_bucket
   command: >
     bash -c "{{ minio_client_bin }} alias set local http://localhost:9000 {{ minio_root_user }} {{ minio_root_password }} && {{ minio_client_bin }} mb local/mlflow"
+    bash -c "{{ minio_client_bin }} alias set local http://localhost:9000 {{ minio_root_user }} {{ minio_root_password }} && {{ minio_client_bin }} mb local/loki"
   args:
     creates: "/tmp/.mlflow_bucket_created"
   register: _create_mlflow_bucket

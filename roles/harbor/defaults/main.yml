@@ -4,8 +4,8 @@ harbor_home: "/opt/harbor"
 harbor_hostname: "harbor.th1enlm02.live"
 harbor_ip: "10.0.2.10"
 harbor_http_port: 80
-harbor_admin_password: "th1enlm_phuongqth"
-database_password: "th1enlm_phuongqth"
+harbor_admin_password: "thienlm_phuongqth"
+database_password: "thienlm_phuongqth"
 
 docker_insecure_registry: /etc/docker
 
