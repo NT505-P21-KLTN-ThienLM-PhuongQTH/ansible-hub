@@ -30,12 +30,19 @@
   retries: 5
   delay: 2
 
-- name: Create 'mlflow' and 'loki' buckets using mc
-  tags: create_mlflow_bucket
-  command: >
-    bash -c "{{ minio_client_bin }} alias set local http://localhost:9000 {{ minio_root_user }} {{ minio_root_password }} && {{ minio_client_bin }} mb local/mlflow"
-    bash -c "{{ minio_client_bin }} alias set local http://localhost:9000 {{ minio_root_user }} {{ minio_root_password }} && {{ minio_client_bin }} mb local/loki"
+- name: Set MinIO alias
+  shell: "{{ minio_client_bin }} alias set local http://localhost:9000 {{ minio_root_user }} {{ minio_root_password }}"
+
+- name: Create 'mlflow' bucket
+  shell: "{{ minio_client_bin }} mb local/mlflow"
   args:
     creates: "/tmp/.mlflow_bucket_created"
   register: _create_mlflow_bucket
   changed_when: "'Bucket created successfully' in _create_mlflow_bucket.stdout"
+
+- name: Create 'loki' bucket
+  shell: "{{ minio_client_bin }} mb local/loki"
+  args:
+    creates: "/tmp/.loki_bucket_created"
+  register: _create_loki_bucket
+  changed_when: "'Bucket created successfully' in _create_loki_bucket.stdout"
