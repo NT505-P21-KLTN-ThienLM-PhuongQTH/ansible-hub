@@ -1,0 +1,26 @@
+# roles/mlflow/defaults/main.yml
+---
+docker_compose_version: "2.20.2"
+mlflow_base_dir: "/home/{{ ansible_user }}/mlops/training"
+
+# MLflow configuration
+mlflow_s3_endpoint_url: "http://10.0.2.10:9000"
+mlflow_port: 5000
+
+# AWS/S3 credentials
+aws_access_key_id: "admin"
+aws_secret_access_key: "thienlm_phuongqth"
+
+# MySQL configuration
+mysql_database: "mlflow_database"
+mysql_user: "mlflow_user"
+mysql_password: "mlflow"
+mysql_root_password: "thienlm_phuongqth"
+mysql_host: "10.0.1.10"
+mysql_port: 3306
+
+# MLflow Python packages versions
+cryptography_version: "44.0.2"
+boto3_version: "1.37.20"
+mlflow_version: "2.21.1"
+pymysql_version: "1.1.1"

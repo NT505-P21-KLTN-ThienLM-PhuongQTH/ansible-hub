@@ -6,17 +6,26 @@
 #   roles:
 #     - haproxy
 
-- name: Install MiniO
-  hosts: storage_servers
-  gather_facts: yes
-  become: yes
-  roles:
-    - minio
-
-- name: Install Harbor
-  hosts: storage_servers
+#- name: Install MiniO
+#  hosts: storage_servers
+#  gather_facts: yes
+#  become: yes
+#  roles:
+#    - minio
+#
+#- name: Install Harbor
+#  hosts: storage_servers
+#  gather_facts: yes
+#  become: yes
+#  roles:
+#    - docker
+#    - harbor
+#
+- name: Install SonarQube and MLflow
+  hosts: mlflow_server
   gather_facts: yes
   become: yes
   roles:
     - docker
-    - harbor
+    - sonarqube
+    - mlflow

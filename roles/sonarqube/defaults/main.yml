@@ -1,0 +1,24 @@
+---
+# defaults/main.yml
+# SonarQube configuration
+sonarqube_dir: /opt/sonarqube
+sonarqube_version: "9.9.3-community"
+sonarqube_port: 9000
+
+# Database configuration
+postgres_version: "15"
+postgres_db: sonar
+postgres_user: root
+postgres_password: thienml_phuongqth
+
+# Docker Compose version (v2)
+docker_compose_version: "v2.24.5"
+
+# SonarQube Java options
+sonarqube_java_opts: "-Xmx2g -Xms1g"
+
+# SonarQube web configuration
+sonarqube_web_java_opts: "-Xmx1g -Xms512m"
+
+# SonarQube CE configuration
+sonarqube_ce_java_opts: "-Xmx2g -Xms512m"
