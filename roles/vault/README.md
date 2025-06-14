@@ -47,7 +47,7 @@ vault operator unseal
 vault login
 ```
 
-6. Access to Vault UI by URL to ensure Vault is unsealed and allow to access: http://vault.th1enlm02.live
+6. Access to Vault UI by URL to ensure Vault is unsealed and allow to access: https://vault.th1enlm02.live
 
 7. Access to K8s cluster and create a Service Account for Vault server which using for authenticating to the K8s cluster, apply the file content below:
 
@@ -163,25 +163,25 @@ vault kv put thesis/production/<application_name> @data.json
 
 ```
 cd /home/ubuntu/app-api
-nano data.json
+sudo nano data.json
 vault kv put thesis/production/app-api @data.json
 ```
 - ghtorrent-api:
 ```
 cd /home/ubuntu/ghtorrent-api
-nano data.json
+sudo nano data.json
 vault kv put thesis/production/ghtorrent-api @data.json
 ```
 - model-api:
 ```
 cd /home/ubuntu/model-api
-nano data.json
+sudo nano data.json
 vault kv put thesis/production/model-api @data.json
 ```
 - model-training:
 ```
 cd /home/ubuntu/model-training
-nano data.json
+sudo nano data.json
 vault kv put thesis/production/model-training @data.json
 ```
 
@@ -192,7 +192,7 @@ vault kv put thesis/production/model-training @data.json
 ```
 helm repo add hashicorp https://helm.releases.hashicorp.com
 helm repo update
-helm install vault hashicorp/vault -f .\helm\vault\values.yml
+helm install vault hashicorp/vault -f .\vault\values.yml
 ```
 
 **Note**: Replace the values.yml path for real context. The values.yml content should be:
