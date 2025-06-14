@@ -1,0 +1,7 @@
+---
+# handlers/main.yml
+- name: restart sonarqube
+  shell: |
+    cd {{ sonarqube_dir }}
+    docker compose restart
+  become: yes

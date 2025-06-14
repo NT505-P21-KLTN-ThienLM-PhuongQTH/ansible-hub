@@ -1,0 +1,143 @@
+---
+# tasks/main.yml
+- name: Update apt cache
+  apt:
+    update_cache: yes
+  become: yes
+
+- name: Install required packages
+  apt:
+    name:
+      - curl
+      - gnupg
+      - lsb-release
+      - ca-certificates
+    state: present
+  become: yes
+
+- name: Check if Docker is installed
+  command: which docker
+  register: docker_check
+  ignore_errors: yes
+
+- name: Install Docker if not present
+  block:
+    - name: Add Docker GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+      become: yes
+
+    - name: Add Docker repository
+      apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+        state: present
+      become: yes
+
+    - name: Install Docker
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: present
+        update_cache: yes
+      become: yes
+
+    - name: Start and enable Docker service
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+      become: yes
+
+    - name: Add user to docker group
+      user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
+      become: yes
+  when: docker_check.rc != 0
+
+- name: Check if Docker Compose is installed
+  command: docker-compose --version
+  register: docker_compose_check
+  ignore_errors: yes
+
+- name: Install Docker Compose if not present
+  block:
+    - name: Download Docker Compose
+      get_url:
+        url: "https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-Linux-x86_64"
+        dest: /usr/local/bin/docker-compose
+        mode: '0755'
+      become: yes
+
+    - name: Create symbolic link for docker-compose
+      file:
+        src: /usr/local/bin/docker-compose
+        dest: /usr/bin/docker-compose
+        state: link
+      become: yes
+  when: docker_compose_check.rc != 0
+
+- name: Create SonarQube directory
+  file:
+    path: "{{ sonarqube_dir }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0755'
+
+- name: Create SonarQube data directories
+  file:
+    path: "{{ sonarqube_dir }}/{{ item }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0755'
+  loop:
+    - sonarqube_data
+    - sonarqube_logs
+    - sonarqube_extensions
+    - postgresql_data
+
+- name: Set vm.max_map_count for Elasticsearch
+  sysctl:
+    name: vm.max_map_count
+    value: '262144'
+    state: present
+    reload: yes
+  become: yes
+
+- name: Set fs.file-max
+  sysctl:
+    name: fs.file-max
+    value: '65536'
+    state: present
+    reload: yes
+  become: yes
+
+- name: Create docker-compose.yml for SonarQube
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ sonarqube_dir }}/docker-compose.yml"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0644'
+  notify: restart sonarqube
+
+- name: Create .env file for SonarQube
+  template:
+    src: .env.j2
+    dest: "{{ sonarqube_dir }}/.env"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0600'
+  notify: restart sonarqube
+
+- name: Start SonarQube services
+  community.docker.docker_compose_v2:
+    project_src: "{{ sonarqube_dir }}"
+    state: present
+  become: yes
