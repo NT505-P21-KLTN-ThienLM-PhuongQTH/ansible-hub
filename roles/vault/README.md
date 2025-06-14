@@ -162,18 +162,26 @@ vault kv put thesis/production/<application_name> @data.json
 - app-api:
 
 ```
+cd /home/ubuntu/app-api
+nano data.json
 vault kv put thesis/production/app-api @data.json
 ```
 - ghtorrent-api:
 ```
+cd /home/ubuntu/ghtorrent-api
+nano data.json
 vault kv put thesis/production/ghtorrent-api @data.json
 ```
 - model-api:
 ```
+cd /home/ubuntu/model-api
+nano data.json
 vault kv put thesis/production/model-api @data.json
 ```
 - model-training:
 ```
+cd /home/ubuntu/model-training
+nano data.json
 vault kv put thesis/production/model-training @data.json
 ```
 
